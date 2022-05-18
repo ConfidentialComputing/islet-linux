@@ -1289,7 +1289,7 @@ out_unlock:
     // TODO: at least, we need to know whether it is device,and  rdonly or rw
     kvm_pr_unimpl("[%s] request to map %lx -> %lx\n", vcpu->kvm->stats_id, fault_ipa, __pfn_to_phys(pfn));
     kvm_pr_unimpl("+++ vttbr_el2:0x%lx\n",  read_sysreg(vttbr_el2));
-    realm_vm_map_memory(0, fault_ipa, __pfn_to_phys(pfn), vma_pagesize, prot & KVM_PGTABLE_PROT_DEVICE);
+    realm_vm_map_memory(vcpu->kvm->arch.realm_vmid, fault_ipa, __pfn_to_phys(pfn), vma_pagesize, prot & KVM_PGTABLE_PROT_DEVICE);
 #endif
 	kvm_set_pfn_accessed(pfn);
 	kvm_release_pfn_clean(pfn);

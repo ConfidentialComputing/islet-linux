@@ -277,10 +277,10 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
 	switch (off) {
 	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
 	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
-        realm_vm_set_reg(0, vcpu->vcpu_id, reg_num, *(u64 *)valp);
+        realm_vm_set_reg(vcpu->kvm->arch.realm_vmid, vcpu->arch.realm_vcpuid, reg_num, *(u64 *)valp);
         break;
 	case KVM_REG_ARM_CORE_REG(regs.pc):
-        realm_vm_set_reg(0, vcpu->vcpu_id, 31, *(u64 *)valp);
+        realm_vm_set_reg(vcpu->kvm->arch.realm_vmid, vcpu->arch.realm_vcpuid, 31, *(u64 *)valp);
         break;
 	case KVM_REG_ARM_CORE_REG(regs.pstate):
         // RMM-TODO: QEMU sets this too.

@@ -140,6 +140,9 @@ struct kvm_arch {
 
 	u8 pfr0_csv2;
 	u8 pfr0_csv3;
+#ifdef CONFIG_REALM
+    u32 realm_vmid;
+#endif
 };
 
 struct kvm_vcpu_fault_info {
@@ -383,6 +386,9 @@ struct kvm_vcpu_arch {
 		u64 last_steal;
 		gpa_t base;
 	} steal;
+#ifdef CONFIG_REALM
+    u32 realm_vcpuid;
+#endif
 };
 
 /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */

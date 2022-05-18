@@ -4,7 +4,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include <linux/types.h>
+#include <vdso/const.h>
 #define u_register_t uint64_t
+
+#if defined(__LINKER__) || defined(__ASSEMBLY__)
+# define   U(_x)    (_x)
+//# define  UL(_x)    (_x)
+//# define ULL(_x)    (_x)
+//# define   L(_x)    (_x)
+//# define  LL(_x)    (_x)
+#else
+# define   U(_x)    (_x##U)
+//# define  UL(_x)    (_x##UL)
+//# define ULL(_x)    (_x##ULL)
+//# define   L(_x)    (_x##L)
+//# define  LL(_x)    (_x##LL)
+#endif
+
 /*
  * SMC calls take a function identifier and up to 7 arguments.
  * Additionally, few SMC calls that originate from EL2 leverage the seventh
@@ -55,4 +71,4 @@ u_register_t realm_vm_set_reg(u_register_t, u_register_t, u_register_t,
 		u_register_t);
 smc_ret_values realm_vm_get_reg(u_register_t, u_register_t, u_register_t);
 smc_ret_values realm_vm_run(u_register_t, u_register_t);
-smc_ret_values realm_vcpu_create(u_register_t, u_register_t);
+smc_ret_values realm_vcpu_create(u_register_t);

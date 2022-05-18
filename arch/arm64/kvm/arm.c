@@ -162,8 +162,15 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
 	set_default_spectre(kvm);
 
 #ifdef CONFIG_REALM
-    realm_vm_create();
-    kvm_pr_unimpl("[%s] created kvm\n", kvm->stats_id);
+    smc_ret_values rets;
+    rets = realm_vm_create();
+    if (rets.ret0 == RET_FAIL) {
+        kvm_pr_unimpl("[%s] failed to create realm vm\n", kvm->stats_id);
+		goto out_free_stage2_pgd;
+    } else {
+        kvm->arch.realm_vmid = rets.ret1;
+        kvm_pr_unimpl("[%s] created realm vm %d\n", kvm->stats_id, kvm->arch.realm_vmid);
+    }
 #endif
 	return ret;
 out_free_stage2_pgd:
@@ -346,8 +353,17 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 		return err;
 
 #ifdef CONFIG_REALM
-    realm_vcpu_create(0, vcpu->vcpu_id);
-    kvm_pr_unimpl("[%s] created vcpu\n", vcpu->kvm->stats_id);
+    smc_ret_values rets;
+    rets = realm_vcpu_create(vcpu->kvm->arch.realm_vmid);
+    if (rets.ret0 == RET_FAIL) {
+        kvm_pr_unimpl("[%s] failed to create vcpu for realm vm\n",
+            vcpu->kvm->stats_id, vcpu->kvm->arch.realm_vmid);
+		return -EINVAL;
+    } else {
+        vcpu->arch.realm_vcpuid = rets.ret1;
+        kvm_pr_unimpl("[%s] created vcpu %d for realm vm %d\n",
+            vcpu->kvm->stats_id, vcpu->arch.realm_vcpuid, vcpu->kvm->arch.realm_vmid);
+    }
 #endif
 	return kvm_share_hyp(vcpu, vcpu + 1);
 }

@@ -151,14 +151,13 @@ smc_ret_values realm_vm_get_reg(u_register_t vm, u_register_t guest,
 	return ret;
 }
 
-smc_ret_values realm_vcpu_create(u_register_t vmid, u_register_t vcpuid)
+smc_ret_values realm_vcpu_create(u_register_t vmid)
 {
 	smc_args args = { 0 };
 	smc_ret_values ret;
 
 	args.fid = SMC_RMM_VCPU_CREATE;
 	args.arg1 = vmid;
-	args.arg2 = vcpuid;
 
 	ret = tftf_smc(&args);
 	return ret;

@@ -10,20 +10,6 @@
 #include "smccc.h"
 //#include <tftf_lib.h>
 
-#if defined(__LINKER__) || defined(__ASSEMBLY__)
-# define   U(_x)    (_x)
-# define  UL(_x)    (_x)
-# define ULL(_x)    (_x)
-# define   L(_x)    (_x)
-# define  LL(_x)    (_x)
-#else
-# define   U(_x)    (_x##U)
-# define  UL(_x)    (_x##UL)
-# define ULL(_x)    (_x##ULL)
-# define   L(_x)    (_x##L)
-# define  LL(_x)    (_x##LL)
-#endif
-
 #define RMI_FNUM_MIN_VALUE	U(0x00)
 #define RMI_FNUM_MAX_VALUE	U(0x20)
 
