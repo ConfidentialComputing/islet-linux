@@ -28,6 +28,10 @@
 
 #include "trace.h"
 
+#ifdef CONFIG_REALM
+#include "realm/rmi.h"
+#endif
+
 const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
 	KVM_GENERIC_VM_STATS()
 };
@@ -266,6 +270,27 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
 	}
 
 	memcpy(addr, valp, KVM_REG_SIZE(reg->id));
+#ifdef CONFIG_REALM
+	u64 reg_num = off - KVM_REG_ARM_CORE_REG(regs.regs[0]);
+	reg_num /= 2;
+
+	switch (off) {
+	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
+	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
+        realm_vm_set_reg(0, vcpu->vcpu_id, reg_num, *(u64 *)valp);
+        break;
+	case KVM_REG_ARM_CORE_REG(regs.pc):
+        realm_vm_set_reg(0, vcpu->vcpu_id, 31, *(u64 *)valp);
+        break;
+	case KVM_REG_ARM_CORE_REG(regs.pstate):
+        // RMM-TODO: QEMU sets this too.
+    default:
+        break;
+    }
+
+    //kvm_pr_unimpl("[%d, %d] set reg(%ld, 0x%lx)\n",
+    //        vcpu->kvm->stats_id, vcpu->vcpu_id, reg_num, *(u64 *)valp);
+#endif
 
 	if (*vcpu_cpsr(vcpu) & PSR_MODE32_BIT) {
 		int i, nr_reg;

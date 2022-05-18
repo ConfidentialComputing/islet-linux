@@ -56,4 +56,12 @@ config NVHE_EL2_DEBUG
 
 	  If unsure, say N.
 
+config REALM
+	bool "ARM CCA based realm support"
+	depends on KVM
+	help
+	  Say Y here to enable realm support.
+
+          If unsure, say N.
+
 endif # VIRTUALIZATION

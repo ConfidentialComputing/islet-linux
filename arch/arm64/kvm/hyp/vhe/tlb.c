@@ -54,6 +54,9 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
 	 * has an ISB in order to deal with this.
 	 */
 	__load_stage2(mmu, mmu->arch);
+#ifdef CONFIG_REALM
+    kvm_pr_unimpl("vttbr_el2:0x%lx, vtcr_el2:0x%lx\n", kvm_get_vttbr(mmu), mmu->arch->vtcr);
+#endif
 	val = read_sysreg(hcr_el2);
 	val &= ~HCR_TGE;
 	write_sysreg(val, hcr_el2);

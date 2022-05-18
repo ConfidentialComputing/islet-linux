@@ -28,6 +28,10 @@
 #include <asm/thread_info.h>
 #include <asm/vectors.h>
 
+#ifdef CONFIG_REALM
+#include "../../realm/rmi.h"
+#endif
+
 /* VHE specific context */
 DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
 DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
@@ -127,6 +131,9 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
 	struct kvm_cpu_context *host_ctxt;
 	struct kvm_cpu_context *guest_ctxt;
 	u64 exit_code;
+#ifdef CONFIG_REALM
+	smc_ret_values realm_ret;
+#endif
 
 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
 	host_ctxt->__hyp_running_vcpu = vcpu;
@@ -155,11 +162,32 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
 
 	do {
 		/* Jump in the fire! */
+#ifdef CONFIG_REALM
+		realm_ret = realm_vm_run(0, vcpu->vcpu_id);
+        // FIXME and TODO: set exit_code as it is expected
+		exit_code = ARM_EXCEPTION_TRAP;
+#else
 		exit_code = __guest_enter(vcpu);
+#endif
 
 		/* And we're baaack! */
 	} while (fixup_guest_exit(vcpu, &exit_code));
 
+#ifdef CONFIG_REALM
+    // fixup_guest_exit() reads esr_el2 and some other el2 registers and then stored them to vcpu->fault
+    // overwrite them after calling fixup_guest_exit
+    kvm_pr_unimpl("[%s] current NW: esr: %#08x -- %s, hpfar: %#08x \n",
+            vcpu->kvm->stats_id,
+            vcpu->arch.fault.esr_el2,
+            esr_get_class_string(vcpu->arch.fault.esr_el2),
+            vcpu->arch.fault.hpfar_el2);
+    kvm_pr_unimpl("received Realm: esr: %#08x -- %s, hpfar: %#08x \n",
+            realm_ret.ret1, esr_get_class_string(realm_ret.ret1), realm_ret.ret2);
+
+    vcpu->arch.fault.esr_el2 = realm_ret.ret1;
+    vcpu->arch.fault.hpfar_el2 = realm_ret.ret2;
+
+#endif
 	sysreg_save_guest_state_vhe(guest_ctxt);
 
 	__deactivate_traps(vcpu);

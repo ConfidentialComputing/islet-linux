@@ -44,6 +44,10 @@
 #include <kvm/arm_pmu.h>
 #include <kvm/arm_psci.h>
 
+#ifdef CONFIG_REALM
+#include "realm/rmi.h"
+#endif
+
 static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
 DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
 
@@ -157,6 +161,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
 
 	set_default_spectre(kvm);
 
+#ifdef CONFIG_REALM
+    realm_vm_create();
+    kvm_pr_unimpl("[%s] created kvm\n", kvm->stats_id);
+#endif
 	return ret;
 out_free_stage2_pgd:
 	kvm_free_stage2_pgd(&kvm->arch.mmu);
@@ -337,6 +345,10 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 	if (err)
 		return err;
 
+#ifdef CONFIG_REALM
+    realm_vcpu_create(0, vcpu->vcpu_id);
+    kvm_pr_unimpl("[%s] created vcpu\n", vcpu->kvm->stats_id);
+#endif
 	return kvm_share_hyp(vcpu, vcpu + 1);
 }
 

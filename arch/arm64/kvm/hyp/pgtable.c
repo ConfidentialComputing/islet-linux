@@ -913,6 +913,14 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
 	if (WARN_ON((pgt->flags & KVM_PGTABLE_S2_IDMAP) && (addr != phys)))
 		return -EINVAL;
 
+#if 0
+//#ifdef CONFIG_REALM
+#include "realm/rmi.h"
+    // TODO: at least, we need to know whether it is device,and  rdonly or rw
+    kvm_pr_unimpl("[%s] request to map %lx -> %lx\n", vcpu->kvm->stats_id, fault_ipa, __pfn_to_phys(pfn));
+    realm_vm_map_memory(0, fault_ipa, __pfn_to_phys(pfn), vma_pagesize, prot & KVM_PGTABLE_PROT_DEVICE);
+#endif
+
 	ret = stage2_set_prot_attr(pgt, prot, &map_data.attr);
 	if (ret)
 		return ret;
