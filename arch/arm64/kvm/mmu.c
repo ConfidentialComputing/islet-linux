@@ -1286,10 +1286,12 @@ out_unlock:
 		write_unlock(&kvm->mmu_lock);
 #ifdef CONFIG_REALM
 #include "realm/rmi.h"
-    // TODO: at least, we need to know whether it is device,and  rdonly or rw
-    kvm_pr_unimpl("[%s] request to map %lx -> %lx\n", vcpu->kvm->stats_id, fault_ipa, __pfn_to_phys(pfn));
-    kvm_pr_unimpl("+++ vttbr_el2:0x%lx\n",  read_sysreg(vttbr_el2));
-    realm_vm_map_memory(vcpu->kvm->arch.realm_vmid, fault_ipa, __pfn_to_phys(pfn), vma_pagesize, prot & KVM_PGTABLE_PROT_DEVICE);
+    // we need to know whether it is device,and rdonly|rw
+    realm_vm_map_memory(vcpu->kvm->arch.realm_vmid,
+                        fault_ipa,
+                        __pfn_to_phys(pfn),
+                        vma_pagesize,
+                        writable | (exec_fault << 1) | (device << 2));
 #endif
 	kvm_set_pfn_accessed(pfn);
 	kvm_release_pfn_clean(pfn);
@@ -1341,7 +1343,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
 	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
 
-    kvm_pr_unimpl("[%s] fault_ipa:%lx, is_iabt:%x\n", vcpu->kvm->stats_id, fault_ipa, is_iabt);
 	/* Synchronous External Abort? */
 	if (kvm_vcpu_abt_issea(vcpu)) {
 		/*

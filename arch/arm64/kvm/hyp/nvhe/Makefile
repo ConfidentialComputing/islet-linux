@@ -18,6 +18,7 @@ obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
 obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
 obj-$(CONFIG_DEBUG_LIST) += list_debug.o
+obj-$(CONFIG_REALM) += ../../realm/rmi.o ../../realm/asm_smc.o
 obj-y += $(lib-objs)
 
 ##

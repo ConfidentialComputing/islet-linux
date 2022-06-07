@@ -10,14 +10,14 @@
 #include "smccc.h"
 //#include <tftf_lib.h>
 
-#define RMI_FNUM_MIN_VALUE	U(0x00)
-#define RMI_FNUM_MAX_VALUE	U(0x20)
+#define RMI_FNUM_MIN_VALUE	U(0x150)
+#define RMI_FNUM_MAX_VALUE	U(0x18F)
 
 /* Get RMI fastcall std FID from function number */
 #define RMI_FID(smc_cc, func_num)			\
 	((SMC_TYPE_FAST << FUNCID_TYPE_SHIFT)	|	\
 	((smc_cc) << FUNCID_CC_SHIFT)		|	\
-	(OEN_ARM_START << FUNCID_OEN_SHIFT)	|	\
+	(OEN_STD_START << FUNCID_OEN_SHIFT)	|	\
 	((func_num) << FUNCID_NUM_SHIFT))
 
 /*
@@ -26,21 +26,18 @@
  * always invoked by the Normal world, forwarded by RMMD and handled by the
  * RMM
  */
-#define RMI_FNUM_VERSION_REQ		U(0)
+#define RMI_FNUM_VERSION_REQ		U(0x150)
+#define RMI_FNUM_GRAN_NS_REALM		U(0x151)
+#define RMI_FNUM_GRAN_REALM_NS		U(0x152)
 
-#define RMI_FNUM_GRAN_NS_REALM		U(1)
-#define RMI_FNUM_GRAN_REALM_NS		U(2)
-
-#define RMI_FNUM_VM_CREATE              U(3)
-#define RMI_FNUM_VM_SWITCH              U(4)
-#define RMI_FNUM_VM_RESUME              U(5)
-#define RMI_FNUM_VM_DESTROY             U(6)
-#define RMI_FNUM_VM_MAP_MEMORY          U(7)
-#define RMI_FNUM_VM_UNMAP_MEMORY        U(8)
-#define RMI_FNUM_VM_SET_REG             U(9)
-#define RMI_FNUM_VM_GET_REG             U(10)
-#define RMI_FNUM_VM_RUN                 U(11)
-#define RMI_FNUM_VCPU_CREATE            U(12)
+#define RMI_FNUM_VM_CREATE              U(0x158)
+#define RMI_FNUM_VM_DESTROY             U(0x159)
+#define RMI_FNUM_VM_RUN                 U(0x160)
+#define RMI_FNUM_VCPU_CREATE            U(0x161)
+#define RMI_FNUM_VM_MAP_MEMORY          U(0x170)
+#define RMI_FNUM_VM_UNMAP_MEMORY        U(0x171)
+#define RMI_FNUM_VM_SET_REG             U(0x172)
+#define RMI_FNUM_VM_GET_REG             U(0x173)
 
 //#define RET_SUCCESS                     U(0)
 //#define RET_FAIL                        U(256)
@@ -56,8 +53,8 @@
 #define SMC_RMM_GRANULE_UNDELEGATE	RMI_FID(SMC_64, RMI_FNUM_GRAN_REALM_NS)
 
 #define SMC_RMM_VM_CREATE               RMI_FID(SMC_64, RMI_FNUM_VM_CREATE)
-#define SMC_RMM_VM_SWITCH               RMI_FID(SMC_64, RMI_FNUM_VM_SWITCH)
-#define SMC_RMM_VM_RESUME               RMI_FID(SMC_64, RMI_FNUM_VM_RESUME)
+//#define SMC_RMM_VM_SWITCH               RMI_FID(SMC_64, RMI_FNUM_VM_SWITCH)
+//#define SMC_RMM_VM_RESUME               RMI_FID(SMC_64, RMI_FNUM_VM_RESUME)
 #define SMC_RMM_VM_DESTROY              RMI_FID(SMC_64, RMI_FNUM_VM_DESTROY)
 #define SMC_RMM_VM_MAP_MEMORY           RMI_FID(SMC_64, RMI_FNUM_VM_MAP_MEMORY)
 #define SMC_RMM_VM_UNMAP_MEMORY         RMI_FID(SMC_64, RMI_FNUM_VM_UNMAP_MEMORY)
@@ -115,7 +112,7 @@ smc_ret_values asm_tftf_smc64(uint32_t fid,
                   u_register_t arg5,
                   u_register_t arg6,
                   u_register_t arg7);
- 
+
 smc_ret_values tftf_smc(const smc_args *args)
 {
     return asm_tftf_smc64(args->fid,

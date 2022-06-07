@@ -21,6 +21,10 @@
 #include <asm/cputype.h>
 #include <asm/virt.h>
 
+#ifdef CONFIG_REALM
+#include "realm/rmi.h"
+#endif
+
 #define CURRENT_EL_SP_EL0_VECTOR	0x0
 #define CURRENT_EL_SP_ELx_VECTOR	0x200
 #define LOWER_EL_AArch64_VECTOR		0x400
@@ -168,12 +172,25 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
 static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
 					 u8 reg_num)
 {
+#ifdef CONFIG_REALM
+    smc_ret_values realm_ret;
+    realm_ret = realm_vm_get_reg(vcpu->kvm->arch.realm_vmid,
+                                 vcpu->arch.realm_vcpuid,
+                                 reg_num);
+    return realm_ret.ret1;
+#endif
 	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs[reg_num];
 }
 
 static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
 				unsigned long val)
 {
+#ifdef CONFIG_REALM
+        realm_vm_set_reg(vcpu->kvm->arch.realm_vmid,
+                         vcpu->arch.realm_vcpuid,
+                         reg_num,
+                         val);
+#endif
 	if (reg_num != 31)
 		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
 }

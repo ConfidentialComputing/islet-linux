@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "rmi.h"
-#include "rmi_lib.h"
+#include <realm/rmi.h>
+#include <realm/rmi_lib.h>
 
 u_register_t realm_version(void)
 {
@@ -64,6 +64,7 @@ smc_ret_values realm_vm_run(u_register_t vm, u_register_t vcpu)
 	return ret;
 }
 
+#if 0
 u_register_t realm_vm_resume(void)
 {
 	smc_args args = { 0 };
@@ -74,7 +75,7 @@ u_register_t realm_vm_resume(void)
 	ret = tftf_smc(&args);
 	return ret.ret0;
 }
-
+#endif
 
 u_register_t realm_vm_destroy(u_register_t vm)
 {
@@ -162,4 +163,3 @@ smc_ret_values realm_vcpu_create(u_register_t vmid)
 	ret = tftf_smc(&args);
 	return ret;
 }
-

@@ -164,8 +164,8 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
 		/* Jump in the fire! */
 #ifdef CONFIG_REALM
 		realm_ret = realm_vm_run(vcpu->kvm->arch.realm_vmid, vcpu->arch.realm_vcpuid);
-        // FIXME and TODO: set exit_code as it is expected
-		exit_code = ARM_EXCEPTION_TRAP;
+        /* ret0: contains exit code */
+		exit_code = realm_ret.ret0;
 #else
 		exit_code = __guest_enter(vcpu);
 #endif
@@ -176,13 +176,15 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
 #ifdef CONFIG_REALM
     // fixup_guest_exit() reads esr_el2 and some other el2 registers and then stored them to vcpu->fault
     // overwrite them after calling fixup_guest_exit
+#if 0
     kvm_pr_unimpl("[%s] current NW: esr: %x -- %s, hpfar: %llx \n",
-            vcpu->kvm->stats_id,
+            __FUNCTION__,
             vcpu->arch.fault.esr_el2,
             esr_get_class_string(vcpu->arch.fault.esr_el2),
             vcpu->arch.fault.hpfar_el2);
     kvm_pr_unimpl("received Realm: esr: %llx -- %s, hpfar: %llx \n",
             realm_ret.ret1, esr_get_class_string(realm_ret.ret1), realm_ret.ret2);
+#endif
 
     vcpu->arch.fault.esr_el2 = realm_ret.ret1;
     vcpu->arch.fault.hpfar_el2 = realm_ret.ret2;

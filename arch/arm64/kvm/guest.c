@@ -283,6 +283,8 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
         realm_vm_set_reg(vcpu->kvm->arch.realm_vmid, vcpu->arch.realm_vcpuid, 31, *(u64 *)valp);
         break;
 	case KVM_REG_ARM_CORE_REG(regs.pstate):
+        realm_vm_set_reg(vcpu->kvm->arch.realm_vmid, vcpu->arch.realm_vcpuid, 32, *(u64 *)valp);
+        break;
         // RMM-TODO: QEMU sets this too.
     default:
         break;

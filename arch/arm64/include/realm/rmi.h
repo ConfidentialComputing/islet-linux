@@ -3,6 +3,9 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+#ifndef __RMI_H__
+#define __RMI_H__
+
 #include <linux/types.h>
 #include <vdso/const.h>
 #define u_register_t uint64_t
@@ -52,7 +55,7 @@ typedef struct {
 	u_register_t	ret7;
 } smc_ret_values;
 
-#define RET_SUCCESS                     U(0)
+#define RET_SUCCESS                     U(257)
 #define RET_FAIL                        U(256)
 #define RET_PAGE_FAULT                  U(1)
 
@@ -72,3 +75,24 @@ u_register_t realm_vm_set_reg(u_register_t, u_register_t, u_register_t,
 smc_ret_values realm_vm_get_reg(u_register_t, u_register_t, u_register_t);
 smc_ret_values realm_vm_run(u_register_t, u_register_t);
 smc_ret_values realm_vcpu_create(u_register_t);
+
+/* Just to avoid compile error with kvm nvhe */
+#if 0
+u_register_t __kvm_nvhe_realm_vm_set_reg(u_register_t, u_register_t, u_register_t,
+		u_register_t);
+smc_ret_values __kvm_nvhe_realm_vm_get_reg(u_register_t, u_register_t, u_register_t);
+u_register_t __kvm_nvhe_realm_vm_set_reg(u_register_t r1,
+                                    u_register_t r2, u_register_t r3, u_register_t r4)
+{
+    return 0x0;
+};
+
+smc_ret_values __kvm_nvhe_realm_vm_get_reg(u_register_t r1,
+                                        u_register_t r2, u_register_t r3)
+{
+    smc_ret_values ret;
+    ret.ret0 = 0;
+    return ret;
+};
+#endif
+#endif /* __RMI_H__ */
