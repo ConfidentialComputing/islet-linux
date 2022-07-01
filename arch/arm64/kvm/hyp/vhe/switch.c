@@ -163,9 +163,12 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
 	do {
 		/* Jump in the fire! */
 #ifdef CONFIG_REALM
-		realm_ret = realm_vm_run(vcpu->kvm->arch.realm_vmid, vcpu->arch.realm_vcpuid);
+		realm_ret = realm_vm_run(vcpu->kvm->arch.realm_vmid,
+                                 vcpu->arch.realm_vcpuid,
+                                 vcpu->arch.realm_vcpu_incr_pc);
         /* ret0: contains exit code */
 		exit_code = realm_ret.ret0;
+        vcpu->arch.realm_vcpu_incr_pc = false;
 #else
 		exit_code = __guest_enter(vcpu);
 #endif
@@ -185,10 +188,9 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
     kvm_pr_unimpl("received Realm: esr: %llx -- %s, hpfar: %llx \n",
             realm_ret.ret1, esr_get_class_string(realm_ret.ret1), realm_ret.ret2);
 #endif
-
     vcpu->arch.fault.esr_el2 = realm_ret.ret1;
     vcpu->arch.fault.hpfar_el2 = realm_ret.ret2;
-
+    vcpu->arch.fault.far_el2 = realm_ret.ret3;
 #endif
 	sysreg_save_guest_state_vhe(guest_ctxt);
 

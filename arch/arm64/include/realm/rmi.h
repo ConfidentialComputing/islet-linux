@@ -73,7 +73,7 @@ u_register_t realm_vm_unmap_memory(u_register_t, u_register_t, u_register_t);
 u_register_t realm_vm_set_reg(u_register_t, u_register_t, u_register_t,
 		u_register_t);
 smc_ret_values realm_vm_get_reg(u_register_t, u_register_t, u_register_t);
-smc_ret_values realm_vm_run(u_register_t, u_register_t);
+smc_ret_values realm_vm_run(u_register_t, u_register_t, bool);
 smc_ret_values realm_vcpu_create(u_register_t);
 
 /* Just to avoid compile error with kvm nvhe */

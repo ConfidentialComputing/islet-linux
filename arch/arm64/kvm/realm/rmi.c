@@ -51,7 +51,7 @@ smc_ret_values realm_vm_create()
 	return ret;
 }
 
-smc_ret_values realm_vm_run(u_register_t vm, u_register_t vcpu)
+smc_ret_values realm_vm_run(u_register_t vm, u_register_t vcpu, bool incr_pc)
 {
 	smc_args args = { 0 };
 	smc_ret_values ret;
@@ -59,6 +59,7 @@ smc_ret_values realm_vm_run(u_register_t vm, u_register_t vcpu)
 	args.fid = SMC_RMM_VM_RUN;
 	args.arg1 = vm;
 	args.arg2 = vcpu;
+	args.arg3 = incr_pc;
 
 	ret = tftf_smc(&args);
 	return ret;

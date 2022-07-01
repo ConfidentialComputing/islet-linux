@@ -388,6 +388,7 @@ struct kvm_vcpu_arch {
 	} steal;
 #ifdef CONFIG_REALM
     u32 realm_vcpuid;
+    bool realm_vcpu_incr_pc;
 #endif
 };
 

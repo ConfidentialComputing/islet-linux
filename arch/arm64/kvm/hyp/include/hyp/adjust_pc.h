@@ -20,6 +20,9 @@ static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
 	} else {
 		*vcpu_pc(vcpu) += 4;
 		*vcpu_cpsr(vcpu) &= ~PSR_BTYPE_MASK;
+#ifdef CONFIG_REALM
+        vcpu->arch.realm_vcpu_incr_pc = true;
+#endif
 	}
 
 	/* advance the singlestep state machine */
