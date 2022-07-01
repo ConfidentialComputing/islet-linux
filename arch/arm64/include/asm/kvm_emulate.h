@@ -174,6 +174,7 @@ static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
 {
 #ifdef CONFIG_REALM
     smc_ret_values realm_ret;
+    if (reg_num == 31) return 0;
     realm_ret = realm_vm_get_reg(vcpu->kvm->arch.realm_vmid,
                                  vcpu->arch.realm_vcpuid,
                                  reg_num);
